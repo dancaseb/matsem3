@@ -6,9 +6,11 @@ A_hat = np.array([[0.1012865073235, 0.1012865073235], [0.7974269853531, 0.101286
 
 
 # User defined parameters
+# corner nodes of the element
 N_start = np.array([[0,0], [3,0], [2,2]])
 N = np.zeros((6,2))
 N[0:3,:] = N_start
+# mid-side nodes
 for i in range(3):
     N[3+i,:] = 0.5*(N_start[(i+1)%3,:] + N_start[(i+2)%3,:])
 # N = np.array([[0,0], [3,0], [2,2], [2.5,1], [1,1], [1.5,0]])
@@ -35,8 +37,6 @@ phi_A_hat = basic_func_P2(A_hat)
 # derivatives of base functions in A_hat
 dphi_de1 = dbasic_func_de1(A_hat)
 dphi_de2 = dbasic_func_de2(A_hat)
-
-chi_local = np.dot(phi_A_hat, N) # shape (7,2), mapping to final element coordinates
 
 # This is redundant in the case of a affine mapping (triangle without curved edges),
 # J is constant for every quadrature point. 
@@ -76,14 +76,14 @@ for q in range(phi_dx1.shape[0]):
         B[q, 2, 2*a]   = phi_dx2[q,a]
         B[q, 2, 2*a+1] = phi_dx1[q,a]
 
-
 C = np.array([[l + 2*mu, l, 0],
               [l, l + 2*mu, 0],
               [0, 0, mu]])
 
+# local stiffness matrix
 K_T = np.zeros((2*N.shape[0], 2*N.shape[0]))
 for q in range(B.shape[0]):
     B_q = B[q,:,:]
     K_T += w[q] * np.dot(B_q.T, np.dot(C, B_q))
 
-# print(K_T)
+print(K_T)
